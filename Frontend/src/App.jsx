@@ -41,7 +41,7 @@ const App = () => {
               if (task.status == "pending")
                 return (
                   <div key={key}>
-                    <div className="task-box1">
+                    <div className="task-box">
                       <div className="d-flex justify-content-between">
                         <h3> {task.title}</h3>
                         <div className="btn-group">
@@ -90,7 +90,7 @@ const App = () => {
               if (task.status == "progress")
                 return (
                   <>
-                    <div className="task-box2">
+                    <div className="task-box">
                       <div className="d-flex justify-content-between">
                         <h3> {task.title}</h3>
                         <div className="btn-group">
@@ -139,7 +139,7 @@ const App = () => {
               if (task.status == "completed")
                 return (
                   <div key={key}>
-                    <div className="task-box3">
+                    <div className="task-box">
                       <div className="d-flex justify-content-between">
                         <h3> {task.title}</h3>
                         <div className="btn-group">
