@@ -1,27 +1,24 @@
 import { useState } from "react";
 import "./App.css";
-const App = () => {
-  const [data, setData] = useState([
-    {
-      id: 1,
-      title: "Task 1",
-      desc: "Create a task app in Mern",
-      status: "pending",
-    },
+import { useSelector, useDispatch } from "react-redux";
+import { updateTaskStatus, addTask } from ".././src/redux/taskSlice";
+import { ToastContainer, toast } from "react-toastify";
 
-    {
-      id: 2,
-      title: "Blogging Task",
-      desc: "Create a blogging app in Mern",
-      status: "progress",
-    },
-    {
-      id: 3,
-      title: "Mobile Application",
-      desc: "Create a Mobile App in React Native",
-      status: "progress",
-    },
-  ]);
+const App = () => {
+  const tasks = useSelector((state) => state?.tasks?.tasks);
+  console.log(tasks, "the tasks is ");
+
+  const dispatch = useDispatch();
+
+  const handleStatusChange = (id, status) => {
+    dispatch(updateTaskStatus({ id, status }));
+    if (status == "progress") toast("Task Started");
+    else toast("Task Completed");
+  };
+
+  const handleAddTask = () => {
+    dispatch(addTask({ id: Date.now(), title: "New Task", status: "pending" }));
+  };
 
   const handleChange = (task, status) => {
     setData((prevData) =>
@@ -36,41 +33,33 @@ const App = () => {
         <div className="main-box">
           <span className="dot1"></span>
           <span className="fs-3">To Start</span>
-          {data.filter((t) => t.status == "pending").length > 0 ? (
-            data.map((task, key) => {
+          <button
+            className="btn btn-primary mx-2"
+            // onClick={() => handleAddTask()}
+            type="button"
+            data-bs-toggle="modal"
+            data-bs-target="#exampleModal"
+          >
+            {" "}
+            Add Task{" "}
+          </button>
+
+          {tasks.filter((t) => t.status == "pending").length > 0 ? (
+            tasks.map((task, index) => {
               if (task.status == "pending")
                 return (
-                  <div key={key}>
+                  <div key={index}>
                     <div className="task-box">
                       <div className="d-flex justify-content-between">
                         <h3> {task.title}</h3>
-                        <div className="btn-group">
-                          <button
-                            type="button"
-                            className="btn btn-danger dropdown-toggle"
-                            data-bs-toggle="dropdown"
-                            aria-expanded="false"
-                          ></button>
-                          <ul className="dropdown-menu">
-                            <li>
-                              <button
-                                className="dropdown-item"
-                                onClick={() => handleChange(task, "progress")}
-                              >
-                                IN Progress
-                              </button>
-                            </li>
-
-                            <li>
-                              <button
-                                className="dropdown-item"
-                                onClick={() => handleChange(task, "completed")}
-                              >
-                                Completed
-                              </button>
-                            </li>
-                          </ul>
-                        </div>
+                        <button
+                          className="btn btn-warning"
+                          onClick={() =>
+                            handleStatusChange(task.id, "progress")
+                          }
+                        >
+                          Start Task
+                        </button>
                       </div>
                       <div>{task.desc}</div>
                       <div className="mt-3 fs-5">Date - 20-5-25</div>
@@ -79,52 +68,33 @@ const App = () => {
                 );
             })
           ) : (
-            <div className="no-task">No Task Assigned Yet</div>
+            <div className="no-task">No Pending Task Left</div>
           )}
         </div>
         <div className=" main-box">
           <div className="dot2"></div>
           <span className="fs-3">In Progress</span>
-          {data.filter((t) => t.status == "progress").length > 0 ? (
-            data.map((task) => {
+          {tasks.filter((t) => t.status == "progress").length > 0 ? (
+            tasks.map((task, index) => {
               if (task.status == "progress")
                 return (
-                  <>
+                  <div key={index}>
                     <div className="task-box">
                       <div className="d-flex justify-content-between">
                         <h3> {task.title}</h3>
-                        <div className="btn-group">
-                          <button
-                            type="button"
-                            className="btn btn-warning dropdown-toggle"
-                            data-bs-toggle="dropdown"
-                            aria-expanded="false"
-                          ></button>
-                          <ul className="dropdown-menu">
-                            <li>
-                              <button
-                                className="dropdown-item"
-                                onClick={() => handleChange(task, "pending")}
-                              >
-                                Not Started
-                              </button>
-                            </li>
-
-                            <li>
-                              <button
-                                className="dropdown-item"
-                                onClick={() => handleChange(task, "completed")}
-                              >
-                                Completed
-                              </button>
-                            </li>
-                          </ul>
-                        </div>
+                        <button
+                          className="btn btn-success"
+                          onClick={() =>
+                            handleStatusChange(task.id, "completed")
+                          }
+                        >
+                          Mark Completed
+                        </button>
                       </div>
                       <div>{task.desc}</div>
                       <div className="mt-3 fs-5">Date - 20-5-25</div>
                     </div>
-                  </>
+                  </div>
                 );
             })
           ) : (
@@ -134,41 +104,14 @@ const App = () => {
         <div className=" main-box">
           <div className="dot3"></div>
           <span className="fs-3">Completed</span>
-          {data.filter((t) => t.status == "completed").length > 0 ? (
-            data.map((task, key) => {
+          {tasks.filter((t) => t.status == "completed").length > 0 ? (
+            tasks.map((task, index) => {
               if (task.status == "completed")
                 return (
-                  <div key={key}>
+                  <div key={index}>
                     <div className="task-box">
                       <div className="d-flex justify-content-between">
                         <h3> {task.title}</h3>
-                        <div className="btn-group">
-                          <button
-                            type="button"
-                            className="btn btn-success dropdown-toggle"
-                            data-bs-toggle="dropdown"
-                            aria-expanded="false"
-                          ></button>
-                          <ul className="dropdown-menu">
-                            <li>
-                              <button
-                                className="dropdown-item"
-                                onClick={() => handleChange(task, "pending")}
-                              >
-                                Not Started
-                              </button>
-                            </li>
-
-                            <li>
-                              <button
-                                className="dropdown-item"
-                                onClick={() => handleChange(task, "progress")}
-                              >
-                                progress
-                              </button>
-                            </li>
-                          </ul>
-                        </div>
                       </div>
                       <div>{task.desc}</div>
                       <div className="mt-3 fs-5">Date - 20-5-25</div>
@@ -181,6 +124,8 @@ const App = () => {
           )}
         </div>
       </div>
+
+      <ToastContainer />
     </>
   );
 };
