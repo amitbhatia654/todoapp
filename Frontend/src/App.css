@@ -1,0 +1,80 @@
+.dot1 {
+  background-color: red;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 20px;
+}
+
+.dot2 {
+  background-color: yellow;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 20px;
+}
+
+.dot3 {
+  background-color: green;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 20px;
+}
+
+.main-box {
+  background-color: rgb(205, 215, 246);
+  padding: 10px;
+  margin: 20px;
+  padding-left: 40px;
+  padding-right: 40px;
+  width: 33%;
+}
+
+.wrapper {
+  display: flex;
+  margin: 40px;
+}
+
+.task-box1 {
+  min-height: 120px;
+  border: 1px solid rgb(94, 131, 232);
+  background-color: white;
+  border-radius: 20px;
+  margin: 10px;
+  padding: 15px;
+}
+
+.task-box2 {
+  min-height: 120px;
+  border: 1px solid rgb(94, 131, 232);
+  background-color: white;
+  border-radius: 20px;
+  margin: 10px;
+  padding: 15px;
+}
+
+.task-box3 {
+  min-height: 120px;
+  border: 1px solid rgb(94, 131, 232);
+  background-color: white;
+  border-radius: 20px;
+  margin: 10px;
+  padding: 15px;
+}
+
+.no-task {
+  min-height: 100px;
+  background-color: rgb(78, 78, 237);
+  color: white;
+  border-radius: 20px;
+  margin: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 1px 3px 5px 8px;
+  font-size: 22px;
+}
