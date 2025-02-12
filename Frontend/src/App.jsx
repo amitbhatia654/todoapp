@@ -7,7 +7,7 @@ export default function App() {
   return (
     <div>
       <HomePage></HomePage>
-      <ToastContainer />
+      <ToastContainer position="bottom-left" />
     </div>
   );
 }
