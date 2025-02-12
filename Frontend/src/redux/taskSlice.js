@@ -1,28 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { getAllTask } from "../Api";
 
 const initialState = {
-  tasks: [
-    {
-      id: 1,
-      title: "Task 1",
-      status: "pending",
-      description: "Create a task app in Mern",
-    },
-    {
-      id: 2,
-      title: "Task 2",
-      description: "Create a Mobile App",
-      status: "completed",
-      assignDate: new Date(),
-    },
-    {
-      id: 3,
-      title: "React Project",
-      description: "Create WebApp using React ",
-      status: "progress",
-      assignDate: new Date(),
-    },
-  ],
+  tasks: await getAllTask(),
 };
 
 // Slice
@@ -34,19 +14,22 @@ const taskSlice = createSlice({
       state.tasks.push(action.payload);
     },
     updateTaskStatus: (state, action) => {
-      const { id, status, title, description } = action.payload;
-      const task = state.tasks.find((task) => task.id === id);
+      const { _id, status, title, description } = action.payload;
+      const task = state.tasks.find((task) => task._id == _id);
       if (task) {
         (task.status = status ? status : task.status),
           (task.title = title ? title : task.title),
           (task.description = description ? description : task.description);
       }
     },
+    removeTask: (state, action) => {
+      state.tasks = state.tasks.filter((task) => task._id != action.payload);
+    },
   },
 });
 
 // Export actions
-export const { addTask, updateTaskStatus } = taskSlice.actions;
+export const { addTask, updateTaskStatus, removeTask } = taskSlice.actions;
 
 // Export reducer
 export default taskSlice.reducer;

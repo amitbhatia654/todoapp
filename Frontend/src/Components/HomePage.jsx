@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { toast } from "react-toastify";
-import { addTask, updateTaskStatus } from "../redux/taskSlice";
+import { addTask, removeTask, updateTaskStatus } from "../redux/taskSlice";
 import { ErrorMessage, Form, Formik } from "formik";
 import { Button, FormControl, OutlinedInput } from "@mui/material";
-import { getAllTask, postTask } from "../Api";
+import { deleteTask, editTaskApi, postTask } from "../Api";
 
 const HomePage = () => {
   const [showModal, setShowModal] = useState(false);
@@ -13,45 +13,40 @@ const HomePage = () => {
 
   const dispatch = useDispatch();
 
-  const handleStatusChange = (id, status) => {
-    dispatch(updateTaskStatus({ id, status }));
-    if (status == "progress") toast("Task Started");
-    else toast("Task Completed");
+  const handleStatusChange = async (values) => {
+    const res = await editTaskApi(values);
+    toast(res.data.message);
+    dispatch(updateTaskStatus(res.data.updatedTask));
   };
-
-  const getTask = async () => {
-    const res = getAllTask();
-  };
-
-  useEffect(() => {
-    getTask();
-  }, []);
 
   const handleSubmit = async (values) => {
     try {
-      const res = postTask(values);
-      if (values.id) {
-        dispatch(updateTaskStatus(values));
-      } else
-        dispatch(
-          addTask({
-            id: Date.now(),
-            startDate: new Date(),
-            title: values.title,
-            description: values.description,
-            status: "pending",
-          })
-        );
+      if (values._id) {
+        const res = await editTaskApi(values);
+        toast(res.data.message);
+        dispatch(updateTaskStatus(res.data.updatedTask));
+      } else {
+        const res = await postTask({ ...values, status: "pending" });
+        toast(res.data.message);
+        dispatch(addTask(res.data.result));
+      }
 
       setShowModal(false);
       setEditTask({});
-    } catch (error) {}
+    } catch (error) {
+      console.log(error, "error");
+    }
+  };
+
+  const handleDelete = async (id) => {
+    const res = await deleteTask(id);
+    dispatch(removeTask(res.data.task._id));
+    toast(res.data.message);
   };
 
   return (
     <>
       <h2 className="text-center mt-2">Task APP</h2>
-
       <div className="wrapper">
         <div className="main-box">
           <span className="dot1"></span>
@@ -67,7 +62,7 @@ const HomePage = () => {
             Add Task{" "}
           </button>
 
-          {tasks.filter((t) => t.status == "pending").length > 0 ? (
+          {tasks?.filter((t) => t.status == "pending").length > 0 ? (
             tasks.map((task, index) => {
               if (task.status == "pending")
                 return (
@@ -77,7 +72,7 @@ const HomePage = () => {
                         <h3> {task.title}</h3>
                         <div>
                           <button
-                            className="btn btn-secondary mx-1"
+                            className="btn btn-secondary "
                             onClick={() => {
                               setEditTask(task), setShowModal(true);
                             }}
@@ -85,9 +80,20 @@ const HomePage = () => {
                             Edit{" "}
                           </button>
                           <button
+                            className="btn btn-danger mx-1"
+                            onClick={() => {
+                              handleDelete(task._id);
+                            }}
+                          >
+                            Delete{" "}
+                          </button>
+                          <button
                             className="btn btn-warning"
                             onClick={() =>
-                              handleStatusChange(task.id, "progress")
+                              handleStatusChange({
+                                ...task,
+                                status: "progress",
+                              })
                             }
                           >
                             Start Task
@@ -100,13 +106,13 @@ const HomePage = () => {
                 );
             })
           ) : (
-            <div className="no-task">No Pending Task Left</div>
+            <div className="no-task">No Pending Task !</div>
           )}
         </div>
         <div className=" main-box">
           <div className="dot2"></div>
           <span className="fs-3">In Progress</span>
-          {tasks.filter((t) => t.status == "progress").length > 0 ? (
+          {tasks?.filter((t) => t.status == "progress").length > 0 ? (
             tasks.map((task, index) => {
               if (task.status == "progress")
                 return (
@@ -117,7 +123,10 @@ const HomePage = () => {
                         <button
                           className="btn btn-success"
                           onClick={() =>
-                            handleStatusChange(task.id, "completed")
+                            handleStatusChange({
+                              ...task,
+                              status: "completed",
+                            })
                           }
                         >
                           Mark Completed
@@ -129,13 +138,13 @@ const HomePage = () => {
                 );
             })
           ) : (
-            <div className="no-task">No Task Started Yet</div>
+            <div className="no-task">No active tasks right now</div>
           )}
         </div>
         <div className=" main-box">
           <div className="dot3"></div>
           <span className="fs-3">Completed</span>
-          {tasks.filter((t) => t.status == "completed").length > 0 ? (
+          {tasks?.filter((t) => t.status == "completed").length > 0 ? (
             tasks.map((task, index) => {
               if (task.status == "completed")
                 return (
@@ -164,7 +173,7 @@ const HomePage = () => {
             <div className="modal-content mymodal">
               <div className="modal-header">
                 <h5 className="modal-title text-center">
-                  {editTask.id ? "Edit" : "Add"} Task
+                  {editTask._id ? "Edit" : "Add"} Task
                 </h5>
                 <button
                   type="button"
@@ -179,7 +188,7 @@ const HomePage = () => {
               <div className="modal-body">
                 <Formik
                   initialValues={
-                    editTask?.id ? editTask : { title: "", description: "" }
+                    editTask?._id ? editTask : { title: "", description: "" }
                   }
                   //   validationSchema={AddFolder}
                   enableReinitialize={true}

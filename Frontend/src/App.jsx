@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "./App.css";
 import HomePage from "./Components/HomePage";
 import { ToastContainer } from "react-toastify";
