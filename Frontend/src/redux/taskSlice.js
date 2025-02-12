@@ -6,19 +6,21 @@ const initialState = {
       id: 1,
       title: "Task 1",
       status: "pending",
-      desc: "Create a task app in Mern",
+      description: "Create a task app in Mern",
     },
     {
       id: 2,
       title: "Task 2",
-      desc: "Create a Mobile App",
+      description: "Create a Mobile App",
       status: "completed",
+      assignDate: new Date(),
     },
     {
       id: 3,
       title: "React Project",
-      desc: "Create WebApp using React ",
+      description: "Create WebApp using React ",
       status: "progress",
+      assignDate: new Date(),
     },
   ],
 };
@@ -32,9 +34,13 @@ const taskSlice = createSlice({
       state.tasks.push(action.payload);
     },
     updateTaskStatus: (state, action) => {
-      const { id, status } = action.payload;
+      const { id, status, title, description } = action.payload;
       const task = state.tasks.find((task) => task.id === id);
-      if (task) task.status = status;
+      if (task) {
+        (task.status = status ? status : task.status),
+          (task.title = title ? title : task.title),
+          (task.description = description ? description : task.description);
+      }
     },
   },
 });
