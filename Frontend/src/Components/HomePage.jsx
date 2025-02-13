@@ -50,7 +50,7 @@ const HomePage = () => {
   };
 
   useEffect(() => {
-    dispatch(fetchTasks()); // Fetch tasks on component mount
+    dispatch(fetchTasks());
   }, [dispatch]);
 
   return (
