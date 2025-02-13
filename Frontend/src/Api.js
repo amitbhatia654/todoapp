@@ -2,6 +2,7 @@ import axios from "axios";
 const BackendUrl = import.meta.env.VITE_BACKEND_URL;
 
 export const getAllTask = async () => {
+  console.log("in fron");
   const res = await axios.get(`${BackendUrl}/api/getAllTasks`);
   return res.data;
 };

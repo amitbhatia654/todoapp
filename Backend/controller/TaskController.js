@@ -11,7 +11,9 @@ const AddTask = async (req, res) => {
 
 const getTask = async (req, res) => {
   try {
+    console.log("it called");
     const result = await task.find();
+    console.log(result, "api ");
     res.status(200).send(result);
   } catch (error) {
     res.send("something went wrong in add task ");

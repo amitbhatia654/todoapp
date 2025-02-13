@@ -5,8 +5,6 @@ const app = express();
 const taskRoute = require("./Routes/taskRoute");
 const connectDb = require("./db");
 
-app.use(express.json());
-
 const port = 5000;
 
 const corsOptions = {

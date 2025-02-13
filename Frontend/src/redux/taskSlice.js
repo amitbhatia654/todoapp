@@ -1,8 +1,12 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { getAllTask } from "../Api";
 
+export const fetchTasks = createAsyncThunk("tasks/fetchTasks", async () => {
+  return await getAllTask();
+});
+
 const initialState = {
-  tasks: await getAllTask(),
+  tasks: [],
 };
 
 // Slice
@@ -25,6 +29,20 @@ const taskSlice = createSlice({
     removeTask: (state, action) => {
       state.tasks = state.tasks.filter((task) => task._id != action.payload);
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchTasks.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchTasks.fulfilled, (state, action) => {
+        state.loading = false;
+        state.tasks = action.payload;
+      })
+      .addCase(fetchTasks.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      });
   },
 });
 

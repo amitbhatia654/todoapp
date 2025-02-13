@@ -1,7 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { toast } from "react-toastify";
-import { addTask, removeTask, updateTaskStatus } from "../redux/taskSlice";
+import {
+  addTask,
+  fetchTasks,
+  removeTask,
+  updateTaskStatus,
+} from "../redux/taskSlice";
 import { ErrorMessage, Form, Formik } from "formik";
 import { Button, FormControl, OutlinedInput } from "@mui/material";
 import { deleteTask, editTaskApi, postTask } from "../Api";
@@ -43,6 +48,10 @@ const HomePage = () => {
     dispatch(removeTask(res.data.task._id));
     toast(res.data.message);
   };
+
+  useEffect(() => {
+    dispatch(fetchTasks()); // Fetch tasks on component mount
+  }, [dispatch]);
 
   return (
     <>
