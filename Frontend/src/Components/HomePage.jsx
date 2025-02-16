@@ -1,20 +1,24 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { toast } from "react-toastify";
+import { ErrorMessage, Form, Formik } from "formik";
+import { Button, FormControl, OutlinedInput } from "@mui/material";
 import {
   addTask,
   fetchTasks,
   removeTask,
   updateTaskStatus,
 } from "../redux/taskSlice";
-import { ErrorMessage, Form, Formik } from "formik";
-import { Button, FormControl, OutlinedInput } from "@mui/material";
+
 import { deleteTask, editTaskApi, postTask } from "../Api";
+import { DndContext } from "@dnd-kit/core";
+import DroppableComp from "./DroppableComp";
+import DraggableComp from "./DraggableComp";
 
 const HomePage = () => {
+  const tasks = useSelector((state) => state?.tasks?.tasks);
   const [showModal, setShowModal] = useState(false);
   const [editTask, setEditTask] = useState({});
-  const tasks = useSelector((state) => state?.tasks?.tasks);
 
   const dispatch = useDispatch();
 
@@ -53,125 +57,136 @@ const HomePage = () => {
     dispatch(fetchTasks());
   }, [dispatch]);
 
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+
+    if (over && over.id == "progress") {
+      const draggedTask = tasks.find((t) => t._id == active.id);
+      handleStatusChange({ ...draggedTask, status: "progress" });
+    }
+
+    if (over && over.id == "completed") {
+      const draggedTask = tasks.find((t) => t._id == active.id);
+      handleStatusChange({ ...draggedTask, status: "completed" });
+    }
+
+    if (over && over.id == "pending") {
+      const draggedTask = tasks.find((t) => t._id == active.id);
+      handleStatusChange({ ...draggedTask, status: "pending" });
+    }
+  };
+
   return (
     <>
-      <h2 className="text-center mt-2">Task APP</h2>
-      <div className="wrapper">
-        <div className="main-box">
-          <span className="dot1"></span>
-          <span className="fs-3">To Start</span>
-          <button
-            className="btn btn-primary mx-2"
-            onClick={() => setShowModal(true)}
-            type="button"
-            data-bs-toggle="modal"
-            data-bs-target="#exampleModal"
-          >
-            {" "}
-            Add Task{" "}
-          </button>
+      <DndContext onDragEnd={handleDragEnd}>
+        <h1 className="text-center mt-2 text-white">TASK APP</h1>
+        <div className="wrapper">
+          <div className="main-box ">
+            <span className="dot1"></span>
+            <span className="fs-2">Pending Task</span>
+            <button
+              className="btn btn-primary mx-2"
+              onClick={() => setShowModal(true)}
+              type="button"
+              data-bs-toggle="modal"
+              data-bs-target="#exampleModal"
+            >
+              {" "}
+              New Task{" "}
+            </button>
 
-          {tasks?.filter((t) => t.status == "pending").length > 0 ? (
-            tasks.map((task, index) => {
-              if (task.status == "pending")
-                return (
-                  <div key={index}>
-                    <div className="task-box">
-                      <div className="d-flex justify-content-between">
-                        <h3> {task.title}</h3>
-                        <div>
+            <DroppableComp
+              title="Drop Here If Pending  "
+              status="pending"
+            ></DroppableComp>
+
+            {tasks?.filter((t) => t.status == "pending").length > 0 ? (
+              tasks.map((task, index) => {
+                if (task.status == "pending")
+                  return (
+                    <div key={index}>
+                      <DraggableComp
+                        task={task}
+                        id={task._id}
+                        handleStatusChange={handleStatusChange}
+                        setShowModal={setShowModal}
+                        setEditTask={setEditTask}
+                      ></DraggableComp>
+                    </div>
+                  );
+              })
+            ) : (
+              <div className="no-task">No Pending Task !</div>
+            )}
+          </div>
+
+          <div className=" main-box">
+            <div className="dot2"></div>
+            <span className="fs-2">In Progress</span>
+            <DroppableComp
+              title="Drop Here To Start Task"
+              status="progress"
+            ></DroppableComp>
+            {tasks?.filter((t) => t.status == "progress").length > 0 ? (
+              tasks.map((task, index) => {
+                if (task.status == "progress")
+                  return (
+                    <div key={index}>
+                      <DraggableComp
+                        task={task}
+                        id={task._id}
+                        handleStatusChange={handleStatusChange}
+                      ></DraggableComp>
+                      {/* <div className="task-box">
+                        <div className="d-flex justify-content-between">
+                          <h3> {task.title}</h3>
                           <button
-                            className="btn btn-secondary "
-                            onClick={() => {
-                              setEditTask(task), setShowModal(true);
-                            }}
-                          >
-                            Edit{" "}
-                          </button>
-                          <button
-                            className="btn btn-danger mx-1"
-                            onClick={() => {
-                              handleDelete(task._id);
-                            }}
-                          >
-                            Delete{" "}
-                          </button>
-                          <button
-                            className="btn btn-warning"
+                            className="btn btn-success"
                             onClick={() =>
                               handleStatusChange({
                                 ...task,
-                                status: "progress",
+                                status: "completed",
                               })
                             }
                           >
-                            Start Task
+                            Mark Completed
                           </button>
                         </div>
-                      </div>
-                      <div>{task.description}</div>
+                        <div>{task.description}</div>
+                      </div> */}
                     </div>
-                  </div>
-                );
-            })
-          ) : (
-            <div className="no-task">No Pending Task !</div>
-          )}
-        </div>
-        <div className=" main-box">
-          <div className="dot2"></div>
-          <span className="fs-3">In Progress</span>
-          {tasks?.filter((t) => t.status == "progress").length > 0 ? (
-            tasks.map((task, index) => {
-              if (task.status == "progress")
-                return (
-                  <div key={index}>
-                    <div className="task-box">
-                      <div className="d-flex justify-content-between">
-                        <h3> {task.title}</h3>
-                        <button
-                          className="btn btn-success"
-                          onClick={() =>
-                            handleStatusChange({
-                              ...task,
-                              status: "completed",
-                            })
-                          }
-                        >
-                          Mark Completed
-                        </button>
-                      </div>
-                      <div>{task.description}</div>
+                  );
+              })
+            ) : (
+              <div className="no-task">No active tasks right now</div>
+            )}
+          </div>
+          <div className=" main-box">
+            <div className="dot3"></div>
+            <span className="fs-2">Completed</span>
+            <DroppableComp
+              title="Drop Here When Completed "
+              status="completed"
+            ></DroppableComp>
+            {tasks?.filter((t) => t.status == "completed").length > 0 ? (
+              tasks.map((task, index) => {
+                if (task.status == "completed")
+                  return (
+                    <div key={index}>
+                      <DraggableComp
+                        task={task}
+                        id={task._id}
+                        handleStatusChange={handleStatusChange}
+                      ></DraggableComp>
                     </div>
-                  </div>
-                );
-            })
-          ) : (
-            <div className="no-task">No active tasks right now</div>
-          )}
+                  );
+              })
+            ) : (
+              <div className="no-task">No Task completed Yet</div>
+            )}
+          </div>
         </div>
-        <div className=" main-box">
-          <div className="dot3"></div>
-          <span className="fs-3">Completed</span>
-          {tasks?.filter((t) => t.status == "completed").length > 0 ? (
-            tasks.map((task, index) => {
-              if (task.status == "completed")
-                return (
-                  <div key={index}>
-                    <div className="task-box">
-                      <div className="d-flex justify-content-between">
-                        <h3> {task.title}</h3>
-                      </div>
-                      <div>{task.description}</div>
-                    </div>
-                  </div>
-                );
-            })
-          ) : (
-            <div className="no-task">No Task completed Yet</div>
-          )}
-        </div>
-      </div>
+      </DndContext>
       {showModal && (
         <div className="modal show d-block " tabIndex="-1" role="dialog">
           <div
