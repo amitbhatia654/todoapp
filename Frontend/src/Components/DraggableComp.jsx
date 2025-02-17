@@ -1,15 +1,17 @@
 import { useDraggable } from "@dnd-kit/core";
+import { deleteTask } from "../Api";
 
-export default function DraggableComp({
-  task,
-  handleStatusChange,
-  setShowModal,
-  setEditTask,
-}) {
+export default function DraggableComp({ task, setShowModal, setEditTask }) {
   const { attributes, listeners, setNodeRef, isDragging, transform } =
     useDraggable({
       id: task._id,
     });
+
+  const handleDelete = async (id) => {
+    const res = await deleteTask(id);
+    dispatch(removeTask(res.data.task._id));
+    toast(res.data.message);
+  };
 
   const preventDragOnButtonClick = (e) => {
     console.log("it comesss");

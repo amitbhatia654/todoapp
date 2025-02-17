@@ -3,14 +3,9 @@ import { useSelector, useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import { ErrorMessage, Form, Formik } from "formik";
 import { Button, FormControl, OutlinedInput } from "@mui/material";
-import {
-  addTask,
-  fetchTasks,
-  removeTask,
-  updateTaskStatus,
-} from "../redux/taskSlice";
+import { addTask, fetchTasks, updateTaskStatus } from "../redux/taskSlice";
 
-import { deleteTask, editTaskApi, postTask } from "../Api";
+import { editTaskApi, postTask } from "../Api";
 import { DndContext } from "@dnd-kit/core";
 import DroppableComp from "./DroppableComp";
 import DraggableComp from "./DraggableComp";
@@ -45,12 +40,6 @@ const HomePage = () => {
     } catch (error) {
       console.log(error, "error");
     }
-  };
-
-  const handleDelete = async (id) => {
-    const res = await deleteTask(id);
-    dispatch(removeTask(res.data.task._id));
-    toast(res.data.message);
   };
 
   useEffect(() => {
@@ -107,8 +96,6 @@ const HomePage = () => {
                     <div key={index}>
                       <DraggableComp
                         task={task}
-                        id={task._id}
-                        handleStatusChange={handleStatusChange}
                         setShowModal={setShowModal}
                         setEditTask={setEditTask}
                       ></DraggableComp>
