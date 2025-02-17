@@ -1,5 +1,8 @@
 import { useDraggable } from "@dnd-kit/core";
 import { deleteTask } from "../Api";
+import { useDispatch } from "react-redux";
+import { toast } from "react-toastify";
+import { removeTask } from "../redux/taskSlice";
 
 export default function DraggableComp({ task, setShowModal, setEditTask }) {
   const { attributes, listeners, setNodeRef, isDragging, transform } =
@@ -7,25 +10,13 @@ export default function DraggableComp({ task, setShowModal, setEditTask }) {
       id: task._id,
     });
 
+  const dispatch = useDispatch();
+
   const handleDelete = async (id) => {
     const res = await deleteTask(id);
     dispatch(removeTask(res.data.task._id));
     toast(res.data.message);
   };
-
-  const preventDragOnButtonClick = (e) => {
-    console.log("it comesss");
-    e.stopPropagation(); // Prevent drag event from being triggered
-  };
-
-  //   const handleMouseDown = (e) => {
-  //     if (e.target.tagName === "BUTTON") {
-  //       // Prevent drag if it's a button
-  //       console.log("button");
-  //       setDrag(false);
-  //       e.stopPropagation();
-  //     }
-  //   };
 
   return (
     <>
@@ -35,7 +26,7 @@ export default function DraggableComp({ task, setShowModal, setEditTask }) {
         ref={setNodeRef}
         {...listeners}
         {...attributes}
-        // onMouseDown={handleMouseDown}
+        id="tasking"
         style={{
           backgroundColor: isDragging ? "green" : "",
           cursor: "move",
@@ -50,12 +41,8 @@ export default function DraggableComp({ task, setShowModal, setEditTask }) {
             <div>
               <button
                 className="btn btn-secondary "
-                // onMouseDown={(e) => preventDragOnButtonClick(e)}
-                //   onMouseDown={preventDragOnButtonClick}
-                //   onMouseEnter={preventDragOnButtonClick}
+                onPointerDown={(e) => e.stopPropagation()}
                 onClick={(e) => {
-                  // e.stopPropagation();
-                  console.log("it clicckkedd");
                   setEditTask(task), setShowModal(true);
                 }}
               >
@@ -63,23 +50,13 @@ export default function DraggableComp({ task, setShowModal, setEditTask }) {
               </button>
               <button
                 className="btn btn-danger mx-1"
-                onClick={() => {
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={(e) => {
                   handleDelete(task._id);
                 }}
               >
                 Delete{" "}
               </button>
-              {/* <button
-              className="btn btn-warning"
-              onClick={() =>
-                handleStatusChange({
-                  ...task,
-                  status: "progress",
-                })
-              }
-            >
-              Start Task
-            </button> */}
             </div>
           )}
         </div>
